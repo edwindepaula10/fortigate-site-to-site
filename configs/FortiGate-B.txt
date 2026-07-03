@@ -1,0 +1,68 @@
+config system interface
+    edit port2
+        set mode static
+        set ip 10.24.15.6 255.255.255.252
+        set allowaccess ping https ssh
+    next
+    edit port1
+        set mode static
+        set ip 192.168.15.1 255.255.255.0
+        set allowaccess ping https ssh
+    next
+end
+
+config router static
+    edit 1
+        set dst 0.0.0.0 0.0.0.0
+        set gateway 10.24.15.5
+        set device port2
+    next
+    edit 2
+        set dst 192.168.24.0 255.255.255.0
+        set device VPN-2415
+    next
+end
+
+config vpn ipsec phase1-interface
+    edit VPN-2415
+        set interface port2
+        set peertype any
+        set proposal des-sha256
+        set dhgrp 14
+        set remote-gw 10.24.15.1
+        set psksecret Edwin2024
+    next
+end
+
+config vpn ipsec phase2-interface
+    edit VPN-2415-P2
+        set phase1name VPN-2415
+        set proposal des-sha256
+        set dhgrp 14
+        set src-subnet 192.168.15.0 255.255.255.0
+        set dst-subnet 192.168.24.0 255.255.255.0
+    next
+end
+
+config firewall policy
+    edit 1
+        set name LAN-to-VPN
+        set srcintf port1
+        set dstintf VPN-2415
+        set srcaddr all
+        set dstaddr all
+        set action accept
+        set schedule always
+        set service ALL
+    next
+    edit 2
+        set name VPN-to-LAN
+        set srcintf VPN-2415
+        set dstintf port1
+        set srcaddr all
+        set dstaddr all
+        set action accept
+        set schedule always
+        set service ALL
+    next
+end
