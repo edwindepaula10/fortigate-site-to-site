@@ -1,3 +1,7 @@
+config system global
+    set admin-https-ssl-versions tlsv1-0 tlsv1-1 tlsv1-2
+end
+
 config system interface
     edit port2
         set mode static
@@ -14,10 +18,6 @@ config system interface
         set ip 192.168.10.200 255.255.255.0
         set allowaccess ping https ssh http
     next
-end
-
-config system global
-    set admin-https-ssl-versions tlsv1-0 tlsv1-1 tlsv1-2
 end
 
 config router static
